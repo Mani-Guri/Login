@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login with OTP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+    #otpSection {
+      display: none;
+    }
+    .success {
+      color: green;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="emailSection">
+      <h2>Login</h2>
+      <input type="email" id="email" placeholder="Enter your email" required />
+      <button onclick="sendOTP()">Send OTP</button>
+    </div>
+
+    <div id="otpSection">
+      <input type="text" id="otp" placeholder="Enter OTP" required />
+      <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
+
+    <p id="message" class="success"></p>
+  </div>
+
+  <script>
+    let userEmail = "";
+
+    function sendOTP() {
+      userEmail = document.getElementById("email").value;
+      if (!userEmail) {
+        alert("Please enter your email");
+        return;
+      }
+
+      // 🔗 Replace with your actual API endpoint
+      fetch('https://your-api.com/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: userEmail })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById("emailSection").style.display = "none";
+          document.getElementById("otpSection").style.display = "block";
+        } else {
+          alert(data.message || "Failed to send OTP");
+        }
+      })
+      .catch(error => {
+        console.error("Error sending OTP:", error);
+        alert("Network error");
+      });
+    }
+
+    function verifyOTP() {
+      const otp = document.getElementById("otp").value;
+
+      if (!otp) {
+        alert("Please enter OTP");
+        return;
+      }
+
+      // 🔗 Replace with your actual API endpoint
+      fetch('https://your-api.com/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: userEmail, otp: otp })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById("otpSection").style.display = "none";
+          document.getElementById("message").textContent = "Login Successful!";
+          // ⏩ Optional: redirect to dashboard
+          // window.location.href = "/dashboard.html";
+        } else {
+          alert(data.message || "Invalid OTP");
+        }
+      })
+      .catch(error => {
+        console.error("Error verifying OTP:", error);
+        alert("Network error");
+      });
+    }
+  </script>
+</body>
+</html>
